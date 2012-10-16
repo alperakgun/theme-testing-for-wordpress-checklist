@@ -1,0 +1,119 @@
+Template File Checklist
+
+From Wordpress.org http://codex.wordpress.org/Theme_Development
+When developing a Theme, check your template files against the following template file standards.
+
+1) [0/6] Document Head (header.php)
+   1. [ ] Use the proper DOCTYPE.
+   2. [ ] The opening <html> tag should include language_attributes().
+   3. [ ] The "content-type" meta element should be placed before everything else, including the title element.
+   4. [ ] Use bloginfo() to fetch the title and description.
+   5. [ ] Use automatic feed links to add feed links.
+   6. [ ] Add a call to wp_head(). Plugins use this action hook to add their own scripts, stylesheets, and other functionality. 
+
+Here's an example of a correctly-formatted HTML5 compliant head area:
+#+begin_html
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+    <head>
+        <meta charset="<?php bloginfo( 'charset' ); ?>" />
+        <title><?php wp_title(); ?></title>
+        <link rel="profile" href="http://gmpg.org/xfn/11" />
+        <link rel="stylesheet" href="<?php echo get_stylesheet_uri(); ?>" type="text/css" media="screen" />
+        <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
+        <?php if ( is_singular() && get_option( 'thread_comments' ) ) wp_enqueue_script( 'comment-reply' ); ?>
+        <?php wp_head(); ?>
+    </head>
+#+end_html
+
+
+2) [0/3] Navigation Menus (header.php)
+   1. [ ] The Theme's main navigation should support a custom menu with wp_nav_menu().
+   2. [ ] Menus should support long link titles and a large amount of list items. These items should not break the design or layout.
+   3. [ ] Submenu items should display correctly. If possible, support drop-down menu styles for submenu items. Drop-downs allowing showing menu depth instead of just showing the top level. 
+
+3) [0/2] Widgets (sidebar.
+   1. [ ] The Theme should be widgetized as fully as possible. Any area in the layout that works like a widget (tag cloud, blogroll, list of categories) or could accept widgets (sidebar) should allow widgets.
+   2. [ ] Content that appears in widgetized areas by default (hard-coded into the sidebar, for example) should disappear when widgets are enabled from Appearance > Widgets. 
+
+4) [0/1] Footer (footer.
+   1. [ ] Use a wp_footer() call, to appear just before closing body tag. 
+#+begin_html
+<?php wp_footer(); ?>
+</body>
+</html>
+#+end_html
+
+
+1) [0/2] Index (index.php)
+   1. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
+   2. [ ] Include wp_link_pages() to support navigation links within posts. 
+
+2) [0/3] Archive (archive.php)
+   1. [ ] Display archive title (tag, category, date-based, or author archives).
+   2. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
+   3. [ ] Include wp_link_pages() to support navigation links within posts. 
+
+3) [0/5] Pages (page.php)
+   1. [ ] Display page title and page content.
+   2. [ ] Display comment list and comment form (unless comments are off).
+   3. [ ] Include wp_link_pages() to support navigation links within a page.
+   4. [ ] Metadata such as tags, categories, date and author should not be displayed.
+   5. [ ] Display an "Edit" link for logged-in users with edit permissions. 
+
+4) [0/11] Single Post (single.php)
+   1. [ ] Include wp_link_pages() to support navigation links within a post.
+   2. [ ] Display post title and post content.
+   3. [ ] The title should be plain text instead of a link pointing to itself.
+   4. [ ] Display the post date.
+   5. [ ] Respect date and time format settings unless it's important to the design. (User settings for date and time format are in Settings > General.)
+   6. [ ] For output based on the user setting, use the_time( get_option( 'date_format' ) ). 
+   7. [ ] Display the author name (if appropriate).
+   8. [ ] Display post categories and post tags.
+   9. [ ] Display an "Edit" link for logged-in users with edit permissions.
+   10. [ ] Display comment list and comment form.
+   11. [ ] Show navigation links to next and previous post using previous_post_link() and next_post_link(). 
+
+5) [0/5] Comments (comments.php)
+   1. [ ] Author comment should be highlighted differently.
+   2. [ ] Display gravatars (user avatars) if appropriate.
+   3. [ ] Support threaded comments.
+   4. [ ] Display trackbacks/pingbacks.
+   5. [ ] This file shouldn’t contain function defines unless in a function_exist() check to avoid redeclaration errors. Ideally all functions should be in functions.php. 
+
+6) [0/2] Search Results (search.php)
+   1. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
+   2. [ ] The search results page show the previous search term. It's a simple but useful way to remind someone what they just searched for -- especially in the case of zero results. Use the_search_query or get_search_query (echo or return the value). For example:
+#+begin_html
+    <h2><?php printf( __( 'Search Results for: %s' ), '<span>' . get_search_query() . '</span>'); ?></h2>
+#+end_html
+    It's a good practice to include the search form again on the results page. Include it with: get_search_form(). 
+
+7) [0/3] JavaScript
+    1. [ ] JavaScript code should be placed in external files whenever possible.
+    2. [ ] Use wp_enqueue_script to load your scripts.
+    3. [ ] JavaScript loaded directly into HTML documents (template files) should be CDATA encoded to prevent errors in older browsers. 
+#+begin_html
+<script type="text/javascript">
+/* <![CDATA[ */
+// content of your Javascript goes here
+/* ]]> */
+</script>
+#+end_html
+
+1) [0/5] Screenshot
+   1. [ ] Create a screenshot for your theme. The screenshot should be named screenshot.png, and should be placed in the top level directory. The screenshot should accurately show the theme design and saved in PNG format. The recommended image size is 300x225.
+   2. [ ] Theme Options
+   3. [ ] Themes can optionally include an options page. For example code, see A Sample WordPress Theme Options Page.
+   4. [ ] When enabling an options page, use the edit_theme_options capability instead of switch_themes for options panels, unless the user actually should be able to switch Themes to be able to use your options panel. WordPress itself uses the edit_theme_options capability for menus, background, header, widgets, et cetera. See more at Roles and Capabilities and Adding Administration Menus.
+   5. [ ] A note about network mode and Theme options: If you are using the edit_themes capability anywhere in your Theme, and the Theme is running on a network-enabled WordPress install (previously WordPress MU), be aware that the edit_themes capability used for accessing Theme options pages will prevent site admins in a network from seeing the options menu. Use edit_theme_options instead.
+
+2) [0/8] Theme Testing Process
+   1. [ ] Fix PHP and WordPress errors. Add the following debug setting to your wp-config.php file to see deprecated function calls and other WordPress-related errors: define('WP_DEBUG', true);. See Deprecated Functions Hook for more information.
+   2. [ ] Check template files against Template File Checklist (see above).
+   3. [ ] Do a run-through using the Theme Unit Test.
+   4. [ ] Validate HTML and CSS. See Validating a Website.
+   5. [ ] Check for JavaScript errors.
+   6. [ ] Test in all your target browsers. For example, IE7, IE8, IE9, Safari, Chrome, Opera, and Firefox.
+   7. [ ] Clean up any extraneous comments, debug settings, or TODO items.
+   8. [ ] See Theme Review if you are publicly releasing the Theme by submitting it to the Themes Directory
