@@ -1,0 +1,413 @@
+Theme Review Guidelines
+http://codex.wordpress.org/Theme_Review
+
+
+Code Quality
+WordPress
+
+    Code Obsolescence
+        Themes must not generate any deprecated function or _doing_it_wrong() notices 
+    Backward compatibility:
+        Themes must not provide backward compatibility for out-of-date WordPress versions, including using function_exists() conditional wrappers for current WordPress functions.
+            Themes must not support backward compatibility for more than two prior major WordPress versions (currently, that means versions prior to WordPress 3.2)
+            Themes should not support backward compatibility for more than one prior major WordPress version (currently, that means versions prior to WordPress 3.3) 
+
+PHP, JS, CSS, HTML
+
+    Themes must not have any notices, warnings, or errors. Test using one of the following methods:
+        Via wp-config.php: define(WP_DEBUG, true);
+        Via Plugin: Log Deprecated Notices and/or Debogger 
+    Themes must not generate any JavaScript errors
+    Themes are recommended to utilize current recognized version(s) of (X)HTML and CSS, and to test using one of the following methods:
+        W3C XHTML Validator + W3C CSS Validator
+        W3C XHTML+CSS Validator (Unicorn) 
+
+Doctype Declaration
+
+    Themes are required to have a valid HTML document HEAD:
+        Valid DOCTYPE declaration
+        <html> tag includes language_attributes()
+        Correct XFN profile link in <head> tag: <head profile="http://gmpg.org/xfn/11"> or <link rel="profile" href="http://gmpg.org/xfn/11" /> (Exception: Wholly HTML 5 themes must not have the profile, as HTML 5 does not support it.)
+        Correct content-type meta declaration: <meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" /> OR <meta charset="<?php bloginfo('charset'); ?>" /> declared before <title>
+        <title> includes bloginfo() for title and description, as appropriate 
+
+Theme Namespacing
+
+    Themes are required to use theme-slug (or a reasonable facsimile) as textdomain for translation
+    Themes are required to use a unique slug as a prefix for anything in the public namespace, including all custom function names, classes, hooks, public/global variables, database entries (Theme options, post custom metadata, etc.)
+        Themes are recommended to use theme-slug as this unique slug 
+
+Note, when using a theme slug for text translation methods, the slug must be a string and not a variable or constant. Using a variable or constant will work fine in PHP, but causes problems for automated text translation tools. For more information, see Mark Jaquith's post on this topic. This guideline is required to be followed for all uses of the I18N translation mechanisms.
+Presentation vs Functionality
+
+    Language
+        Themes are required to have all public-facing text in English.
+        Theme may optionally incorporate translation/internationalization; however, if incorporated, translation/internationalization must support WordPress core functionality
+            Themes are required to use a string, rather than a variable, constant, or concatenation, as the textdomain in translation functions. 
+    Favicons
+        Themes are recommended not to implement custom favicon functionality.
+            If implemented, favicon functionality is required to be opt-in, and disabled by default.
+            If implemented, favicon functionality is required to support user-defined favicon images 
+
+Theme Features
+
+Theme is required to incorporate the following WordPress core features:
+
+    Automatic Feed Links:
+        add_theme_support( 'automatic-feed-links' ) 
+    Widgets:
+        dynamic_sidebar()
+        register_sidebar()
+        add_action(widgets_init), register_widget() (see Widgets API) – (if Theme uses custom widgets) 
+    Comments:
+        comments_template()
+        wp_list_comments()
+        comment_class() – (if using callback for wp_list_comments())
+        comment_form()
+        wp_enqueue_script( 'comment-reply' )
+
+Theme is recommended to incorporate the following WordPress core features, but is not required to do so. However, if incorporated, features must support the core WordPress implementation:
+
+    Navigation Menus:
+        wp_nav_menu()
+        register_nav_menu() or register_nav_menus() in functions.php
+        The following functions may only be used for navigation menus as a callback to wp_nav_menu(), as part of a has_nav_menu() conditional, or similar: wp_list_pages, wp_list_categories, wp_page_menu, etc. 
+    Post Thumbnails:
+        the_post_thumbnail()
+        add_theme_support('post-thumbnails') in functions.php 
+    Custom Headers:
+        add_theme_support('custom-header') in functions.php 
+    Custom Backgrounds:
+        add_theme_support('custom-background') in functions.php 
+    Visual Editor CSS:
+        add_editor_style()
+        editor-style.css file 
+
+Theme must not incorporate the following features:
+
+    Admin Pointers 
+
+Template Tags and Hooks
+
+All template tags and hooks used in a Theme are required to be implemented properly.
+Required Hooks and Navigation
+
+The following template tags and hooks are required to be included where appropriate:
+
+    wp_title()
+    wp_head() – (immediately before </head>)
+    body_class() – (inside <body> tag)
+    $content_width
+    post_class()
+    wp_link_pages()
+    paginate_comments_links(), or previous_comments_link()/next_comments_link()
+    posts_nav_link(), or previous_posts_link()/next_posts_link(), or paginate_links()
+    wp_footer() – (immediately before </body>) 
+
+Including Files
+
+    If incorporated into the Theme, standard template files are required to be called using the correct template tag.
+        comments.php (via comments_template())
+        header.php (via get_header())
+        footer.php (via get_footer())
+        sidebar.php (via get_sidebar())
+        searchform.php (via get_search_form()) 
+    If incorporated into the Theme, custom template files are required to be called using get_template_part() or locate_template()
+        See here for additional information: How To Load Files Within WordPress Themes
+        include( get_template_directory() . '/file.php' ) must not be used to call Theme template part files. 
+    Legacy Theme Support
+        Themes are required to include all template files called within the Theme, rather than relying upon legacy Theme support. If a Theme uses any of the following functions, it is required to include the appropriate template file:
+            get_footer(): footer.php
+            get_header(): header.php
+            get_sidebar(): sidebar.php
+            comments_template(): comments.php 
+
+Including Stylesheets and Scripts
+
+    Themes are required to enqueue all stylesheets and scripts, using wp_enqueue_style()/wp_enqueue_script(), and hooked into an appropriate hook via callback function, rather than hard-coding stylesheet/script links or tags in the template.
+        Themes are required to use the Theme-specific hook for admin-enqueued scripts/stylesheets, e.g. admin_print_scripts-appearance_page_$menu_slug
+        Themes are recommended to hook stylesheet and script enqueue callbacks into `wp_enqueue_scripts`
+        Themes may optionally link the default stylesheet (style.css) directly in the document head, or via wp_enqueue_style(). Whichever method is used, the default stylesheet must be referenced via get_stylesheet_uri()</tt> 
+    Themes are required to use core-bundled scripts, if using such scripts
+    Themes must not use TimThumb 
+
+Function Parameters, Filters, and Action Hooks
+
+Draft
+
+    Themes are required to use function parameters, filters, and action hooks where appropriate in order to modify content, rather than hard-coding:
+        wp_title():
+            Themes are required to modify output via filter (wp_title/body_class/post_class) 
+        body_class()/post_class()
+            Themes are recommended to modify output via filter (body_class/post_class)
+            Themes may optionally modify output via function parameter (body_class( $class )/post_class( $class )) 
+
+Site Information
+
+If incorporated into the Theme, site information is required to be called using the correct template tag:
+
+    Template/Stylesheet Path:
+        Themes are required to use get_template_directory() rather than TEMPLATEPATH to return the template path.
+        Themes are required to use get_stylesheet_directory() rather than STYLESHEETPATH to return the stylesheet path. 
+
+    Themes are required to use *_url() template tags, rather than bloginfo() equivalents.
+        See Trac Ticket #9008 for additional information related to this use of get_option() versus *_url 
+
+    Character Set: bloginfo( 'charset' )
+    Home URL: echo home_url()
+    HTML type: bloginfo( 'html_type' )
+    Feed Links: get_feed_link( 'feed' ) (where feed is rss, rss2, atom)
+    Language: bloginfo( 'language' ) (en-US)
+    Locale: get_locale() (en_US)
+    Parent Theme Directory URL: get_template_directory_uri()
+    Parent Theme Directory File Path: get_template_directory()
+    Parent Theme Name: get_template()
+    Site Description: bloginfo( 'description' )
+    Site Title: bloginfo( 'name' )
+    Style Sheet Directory URL: get_stylesheet_directory_uri()
+    Style Sheet URL: get_stylesheet_uri()
+    Theme Directory File Path: get_stylesheet_directory()
+    Text Direction: bloginfo( 'text_direction' )
+        is_rtl() for conditional statements (recommended) 
+    WordPress URL: echo site_url()
+    WordPress Version: bloginfo( 'version' ) 
+
+WordPress-Generated CSS Classes
+
+Themes are required to support the following WordPress-defined CSS classes, or similar elements:
+
+    Alignment Classes:
+        .aligncenter
+        .alignleft
+        .alignright 
+    Caption Related Classes:
+        .wp-caption
+        .wp-caption-text
+        .gallery-caption 
+    Post Classes:
+        .sticky 
+    Comment Classes:
+        .bypostauthor 
+
+While needing to be present in the stylesheet, .sticky and .bypostauthor can remain empty (unstyled) if desired. The intent is simply to ensure that theme developers have considered all classes generated by WordPress.
+Theme Template Files
+
+Note: Child Themes may include less than this, since they depend on functionality of the parent theme.
+
+Theme is required to include, at a minimum:
+
+    index.php
+    comments.php (via comments_template())
+    screenshot.png
+        Recommended 4:3 W:H ratio, size 300x225px.
+        Maximum size: 320:240px
+        Should be a "reasonable facsimile" of the Theme after it is initially activated with default options 
+    style.css 
+
+Theme is recommended to include:
+
+    404.php
+    archive.php
+    page.php
+    search.php
+    single.php
+    header.php (via get_header())
+    footer.php (via get_footer())
+    sidebar.php (via get_sidebar())
+        Note: header.php, footer.php, and sidebar.php include variations such as: sidebar-left.php, sidebar-right.php, sidebar-footer.php, etc. 
+
+Theme may optionally include:
+
+    attachment.php
+    author.php
+    category.php
+    date.php
+    editor-style.css
+    image.php
+    tag.php 
+
+Themes are recommended to use core markup for the following forms, using the indicated template tag:
+
+    Login Form: Must be included using wp_login_form()
+    Search Form: Must be included using get_search_form()
+        Themes may optionally customize the search form, as searchform.php 
+
+Submitted theme are recommended not to include files named like the following. However, if such files are used, Themes are required to provide end-user documentation explaining how to use them:
+
+    page-foobar.php
+    category-foobar.php
+    tag-foobar.php
+    taxonomy-foobar.php 
+
+Note: The reason to avoid this template naming convention for publicly released Themes is to avoid surprising users that create a page with the "-foobar" slug and expect the default template. See Template_Hierarchy#Page_display.
+Security and Privacy
+Theme Settings and Data Security
+
+    Themes are required to prefix all options, custom functions, custom variables, and custom constants with theme-slug (or appropriate variant).
+    Themes are required to implement Theme Options and Theme Settings pages deliberately, rather than relying on copy-and-paste scripts from website tutorials.
+    Themes are required to use the add_theme_page() function to add the Theme Settings Page to the Appearance menu, rather than using add_menu_page() to add a top-level menu.
+    Themes are required to use the edit_theme_options capability for add_theme_page(), rather than rely on a role (e.g. "administrator"), or a different capability (e.g. "edit_themes", "manage_options") for the capability to add the settings page.
+    Themes are required to save options in a single array, rather than create multiple options for its settings page. Use of set_theme_mod and get_theme_mod handles this for you, as does using the Settings API.
+    For checkboxes and select options, Themes are required to use the checked() and selected() functions for outputting checked="checked" and selected="selected", respectively.
+    Themes are required to validate and sanitize all untrusted data before entering data into the database, and to escape all untrusted data before being output in the Settings form fields or in the Theme template files (see: Data Validation)
+    Themes are required to use esc_attr() for text inputs and esc_html() (or esc_textarea() in WP 3.1) for textareas.
+    Themes are required to provide explicit Settings-page nonce checking, if not using the Settings API (see: WordPress Nonces)
+    Themes are recommended to use the Settings API to get and save form input data rather than rely on $_POST and $_REQUEST data directly.
+    Themes are recommended to use do_settings_sections() to output settings sections/fields, rather than hard-coding markup 
+
+External References
+
+    Incorporating the Settings API in WordPress Themes by Chip Bennett
+    WordPress Settings API Tutorial by Otto
+    A Sample WordPress Theme Options Page by Ian Stewart 
+
+Privacy
+
+    Themes must not "phone home" without informed user consent:
+        Themes are required to implement any collection of user data as OPT-IN; that is, via user-configurable Theme option, disabled by default.
+        Themes are required to include within the Theme all images, scripts, and other bundled resources. Such resources must not be "hotlinked" from a third-party site.
+            Note: API calls, e.g. Google libraries, are acceptable. 
+
+Licensing
+
+    License:
+        Themes are required to be 100% GPL-licensed, or use a GPL-compatible license. This includes all PHP, HTML, CSS, images, fonts, icons, and everything else. All of the theme must be GPL-Compatible.
+        Themes may optionally include a full-text license, referenced as license.txt, or else link to a reasonably permanent URL that contains the full-text license
+        Themes are required to declare their license explicitly, using the following method:
+            Declare License and License URI header slugs to style.css, using this format: 
+
+License: GNU General Public License v2.0
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+    Copyright
+        Themes are required to declare copyright and license information as specified by the applicable license, e.g.: 
+
+Twenty Eleven WordPress Theme, Copyright 2011 WordPress.org
+Twenty Eleven is distributed under the terms of the GNU GPL
+
+        Derivative Themes are required to retain/declare the copyright information of the original work 
+    Bundled Resources
+        Themes are required to state the copyright and license information for any bundled resources not covered by the Theme's license statement. Themes are recommended to state this information in the Theme's README documentation. 
+    Trademark
+        Themes must not clone the design of past or present web site. Themes that clone non-website designs will be considered on a case-by-case basis. 
+
+Up-Sell Themes
+
+    Commercial versions of free Themes (i.e. "freemium" or "up-sell" Themes) are required to be released under GPL-compatible licenses
+    Commercial versions of free Themes must not lock core WordPress features behind the commercial paywall
+    Up-sell Themes may be subjected to more rigorous or additional Theme-Review requirements, at the discretion of the Theme Review Team 
+
+Bundled Resources
+GPL-Compatible Font Licenses
+
+The GNU Foundation and the Fedora Project maintain lists of acceptable licenses for use with GPL (see also: this list).
+
+Fonts bundled with Themes submitted to the WordPress Theme directory are required to be licensed under one of the following font licenses:
+
+    Arphic Public License (Arphic)
+    Baekmuk License (Baekmuk)
+    Bitstream Vera License (Bitstream Vera)
+    GNU GPL (with font exception) (GPL)
+    GUST e-Foundry Font License/LaTeX Project Public License (LPPL)
+    IPA Font License (IPA)
+    Liberation Font License (Liberation)
+    LaTeX Project Public License (LPPL)
+    mplus Font License (mplus)
+    ParaType Font License (PTFL)
+    SIL Open Font License (OFL)
+    STIX Fonts User License (STIX)
+    Wadalab Fonts License (Wadalab)
+    XANO Mincho Font License (XANO) 
+
+GPL-Compatible Icon Sets
+
+Some compatible icon sets include the following:
+
+    Post Formats & Real Estate Icons (GPL)
+    WooCons Set #1 (GPL)
+    Gallery2 Icons (GPL)
+    Lullacons Pack #1 (GPL)
+    GNOME Desktop Icons (GPL)
+    Elegant Media Icons (GPL)
+    Humility Icons (GPL)
+    Crystal Icons (GPL)
+    Flat For Linux (GPL)
+    Ultimate GNOME Icons (GPL)
+    Shrunk Pidgin Smilies (GPL)
+    Twotiny Icons (GPL)
+    Web Design Creatives (GPL)
+    realistiK Reloaded (GPL)
+    Carpelinx (GPL)
+    DarkGlass Reworked (GPL)
+    Lynx Black (GPL)
+    KDE Crystal Diamond (GPL)
+    26 Social Media Icons (GPL)
+    Macchiato – Social and spirit20 (GPL)
+    Faenza Icons (GPL)
+    Lifetime Social Networks (GPL)
+    Social Media Icons from Elegant Themes (GPL)
+    We got icons! (GPL) 
+
+Theme Name
+
+Theme Name Guidelines are required for new Themes, and recommended for existing Themes.
+
+    Themes are not to use WordPress in their name. For example My WordPress Theme, WordPress AwesomeSauce, and AwesomeSauce for WordPress would not be accepted. After all, this is the WordPress Theme repository.
+        Themes are not to use the term Theme in their name, such as: AwesomeSauce Theme. Same reason as above ... it's a Theme repository.
+        Themes may use the WP acronym in the Theme name, such as WP AwesomeSauce. 
+    Themes are not to use version-specific, markup-related terms (e.g. HTML5, CSS3, etc.) in their name.
+    Themes are not to use related terms (e.g. Blog, Web Log, Template, Skin, etc.) in their name.
+    Themes are not to use Theme author/developer credit text in their name. For example AwesomeSauce by John Q. Developer (makes for a much better credit link); or, SEO/SPAM-seeded text, such as: AwesomeSauce by Awesome Free WP Themes (this is just not going to pass).
+    Themes are not to use related Theme names (e.g. WP Twenty Eleven, Twenty Eleven WP, The Twenty Eleven, etc.) in their name. 
+
+Also note, theme names as defined in the style.css header block will be used as the theme slug in the WordPress Extend Theme repository. All names will be turned to lower case and spaces will be replaced with hyphens. For example: 'CamelCase Name' would be 'camelcase-name'.
+Credit Links
+
+    Themes may optionally designate Author URI and Theme URI in style.css.
+        Theme URI, if used, is required to link to a page specifically related to the Theme. If a demonstration site or page is being used, the content must be related to the theme itself.
+        Author URI, if used, is required to link to an author's personal web site or project/development website.
+        Themes are recommended to provide at least one of these two links, in order to ensure Theme users have a point of contact for the Theme developer. 
+    Themes may optionally include a public-facing credit link in the Theme footer.
+        If used, Themes are required to include no more than one such footer credit link.
+        Credit link, if used, is required to use either Theme URI or Author URI.
+        Credit link anchor text and title are required to be relevant and appropriate with respect to the linked site. Spam or SEO-seeded anchor text and titles may subject Themes to automatic rejection.
+        A second "Powered by" link for WordPress is also acceptable, with the link pointing to http://wordpress.org. 
+    Themes may optionally include a Theme Option to display additional credit links or text.
+        If used, such options are required to be opt-in (i.e. disabled by default, rather than enabled)
+        If used, such options are recommended to provide user-modifiable text/links, rather than merely providing an enable/disable option
+        In general, such opt-in credit text/links are exempted from above-listed requirements regarding relevance and appropriateness. However, the Theme Review team reserves the right to prohibit such optional text/links if, at its sole discretion, a Theme abuses this option. 
+    Since Themes are GPL (or compatible), Theme authors are prohibited from requiring that these links be kept by Theme users. An appropriate way to ask for Theme users to keep a link to the author's website is as follows: 
+
+ "It is completely optional, but if you like the Theme I would appreciate it if you keep the credit link at the bottom."
+
+    Determination of appropriateness of AuthorURI and ThemeURI is at the sole, and final, discretion of the Theme Review Team. For AuthorURI, emphasis is on the personal nature of the site. For ThemeURI, a mere demo site is insufficient; the URI must include content predominately related to the Theme. 
+
+    Links in the description of the theme must be appropriately defined in respect to the AuthorURI requirements or to help and assistance to usage of the theme. 
+
+Theme Documentation
+
+    Themes are required to provide end-user documentation of any design limitations or extraordinary installation/setup instructions
+    Themes are recommended to include a readme.txt file, using Plugin readme.txt markdown.
+    In lieu of a readme.txt file, Themes are recommended to include a changelog, indicating version-to-version Theme changes. 
+
+Please be clear about the following in the documentation included with your Theme. The following helps many users over any potential stumbling blocks:
+
+    Indicate precisely what your Theme and template files will achieve.
+    Adhere to the naming conventions of the standard Theme hierarchy.
+    Indicate deficiencies in your Themes, if any.
+    Clearly reference any special modifications in comments within the template and stylesheet files. Add comments to modifications, template sections, and CSS styles, especially those which cross template files.
+    If you have any special requirements, which may include custom Rewrite Rules, or the use of some additional, special templates, images or files, please explicitly state the steps of action a user should take to get your Theme working.
+    Provide contact information (website or email), if possible, for support information and questions. 
+
+It is also recommended, both for standardization and to minimize any risks that may be associated with other file extensions, a readme.txt text file be used for documentation not made in comments within the template and stylesheet files. Other forms of documentation may be included in addition to the readme file at the Theme author's discretion such as "Contextual Help" within the Theme's "option" page(s).
+Theme Unit Tests
+
+The Theme must meet all the requirements of the Theme Unit Test.
+Theme Obsolescence
+
+    Themes must be kept current once submitted, approved, and accepted into the Theme Repository.
+    Any Theme not updated to the current theme review process as of the most recent release of WordPress may be subject to temporary suspension. 
+
+Correct Spelling of WordPress
+
+    Themes are REQUIRED to spell "WordPress" correctly in all public facing text: all one word, with both an uppercase W and P. 
