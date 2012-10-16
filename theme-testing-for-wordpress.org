@@ -12,7 +12,9 @@ When developing a Theme, check your template files against the following templat
    6. [ ] Add a call to wp_head(). Plugins use this action hook to add their own scripts, stylesheets, and other functionality. 
 
 Here's an example of a correctly-formatted HTML5 compliant head area:
+
 #+begin_html
+
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
     <head>
@@ -24,6 +26,7 @@ Here's an example of a correctly-formatted HTML5 compliant head area:
         <?php if ( is_singular() && get_option( 'thread_comments' ) ) wp_enqueue_script( 'comment-reply' ); ?>
         <?php wp_head(); ?>
     </head>
+
 #+end_html
 
 
@@ -39,29 +42,31 @@ Here's an example of a correctly-formatted HTML5 compliant head area:
 4) [0/1] Footer (footer.
    1. [ ] Use a wp_footer() call, to appear just before closing body tag. 
 #+begin_html
+
 <?php wp_footer(); ?>
 </body>
 </html>
+
 #+end_html
 
 
-1) [0/2] Index (index.php)
+5) [0/2] Index (index.php)
    1. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
    2. [ ] Include wp_link_pages() to support navigation links within posts. 
 
-2) [0/3] Archive (archive.php)
+6) [0/3] Archive (archive.php)
    1. [ ] Display archive title (tag, category, date-based, or author archives).
    2. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
    3. [ ] Include wp_link_pages() to support navigation links within posts. 
 
-3) [0/5] Pages (page.php)
+7) [0/5] Pages (page.php)
    1. [ ] Display page title and page content.
    2. [ ] Display comment list and comment form (unless comments are off).
    3. [ ] Include wp_link_pages() to support navigation links within a page.
    4. [ ] Metadata such as tags, categories, date and author should not be displayed.
    5. [ ] Display an "Edit" link for logged-in users with edit permissions. 
 
-4) [0/11] Single Post (single.php)
+8) [0/11] Single Post (single.php)
    1. [ ] Include wp_link_pages() to support navigation links within a post.
    2. [ ] Display post title and post content.
    3. [ ] The title should be plain text instead of a link pointing to itself.
@@ -74,41 +79,45 @@ Here's an example of a correctly-formatted HTML5 compliant head area:
    10. [ ] Display comment list and comment form.
    11. [ ] Show navigation links to next and previous post using previous_post_link() and next_post_link(). 
 
-5) [0/5] Comments (comments.php)
+9) [0/5] Comments (comments.php)
    1. [ ] Author comment should be highlighted differently.
    2. [ ] Display gravatars (user avatars) if appropriate.
    3. [ ] Support threaded comments.
    4. [ ] Display trackbacks/pingbacks.
    5. [ ] This file shouldn’t contain function defines unless in a function_exist() check to avoid redeclaration errors. Ideally all functions should be in functions.php. 
 
-6) [0/2] Search Results (search.php)
+10) [0/2] Search Results (search.php)
    1. [ ] Display a list of posts in excerpt or full-length form. Choose one or the other as appropriate.
    2. [ ] The search results page show the previous search term. It's a simple but useful way to remind someone what they just searched for -- especially in the case of zero results. Use the_search_query or get_search_query (echo or return the value). For example:
 #+begin_html
+
     <h2><?php printf( __( 'Search Results for: %s' ), '<span>' . get_search_query() . '</span>'); ?></h2>
+
 #+end_html
     It's a good practice to include the search form again on the results page. Include it with: get_search_form(). 
 
-7) [0/3] JavaScript
+11) [0/3] JavaScript
     1. [ ] JavaScript code should be placed in external files whenever possible.
     2. [ ] Use wp_enqueue_script to load your scripts.
     3. [ ] JavaScript loaded directly into HTML documents (template files) should be CDATA encoded to prevent errors in older browsers. 
 #+begin_html
+
 <script type="text/javascript">
 /* <![CDATA[ */
 // content of your Javascript goes here
 /* ]]> */
 </script>
+
 #+end_html
 
-1) [0/5] Screenshot
+12) [0/5] Screenshot
    1. [ ] Create a screenshot for your theme. The screenshot should be named screenshot.png, and should be placed in the top level directory. The screenshot should accurately show the theme design and saved in PNG format. The recommended image size is 300x225.
    2. [ ] Theme Options
    3. [ ] Themes can optionally include an options page. For example code, see A Sample WordPress Theme Options Page.
    4. [ ] When enabling an options page, use the edit_theme_options capability instead of switch_themes for options panels, unless the user actually should be able to switch Themes to be able to use your options panel. WordPress itself uses the edit_theme_options capability for menus, background, header, widgets, et cetera. See more at Roles and Capabilities and Adding Administration Menus.
    5. [ ] A note about network mode and Theme options: If you are using the edit_themes capability anywhere in your Theme, and the Theme is running on a network-enabled WordPress install (previously WordPress MU), be aware that the edit_themes capability used for accessing Theme options pages will prevent site admins in a network from seeing the options menu. Use edit_theme_options instead.
 
-2) [0/8] Theme Testing Process
+13) [0/8] Theme Testing Process
    1. [ ] Fix PHP and WordPress errors. Add the following debug setting to your wp-config.php file to see deprecated function calls and other WordPress-related errors: define('WP_DEBUG', true);. See Deprecated Functions Hook for more information.
    2. [ ] Check template files against Template File Checklist (see above).
    3. [ ] Do a run-through using the Theme Unit Test.
